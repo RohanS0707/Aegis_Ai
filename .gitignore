@@ -1,0 +1,5 @@
+node_modules/ 
+aegis-frontend/node_modules/ 
+__pycache__/ 
+*.pyc 
+.env 
