@@ -171,7 +171,7 @@ export default function App(){
           </div>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <div style={{width:7,height:7,borderRadius:"50%",background:"#00ff88",animation:"pulse 2s infinite"}}/>
-            <span style={{fontSize:10,color:"#00ff88",letterSpacing:1}}>XGBoost ONLINE</span>
+            <span style={{fontSize:10,color:"#00ff88",letterSpacing:1}}>RULE-BASED DEMO</span>
           </div>
           <div style={{padding:"5px 14px",borderRadius:3,border:`1px solid ${threatColor}`,color:threatColor,fontSize:10,letterSpacing:1}}>⚠ THREAT: {threatLevel}</div>
         </div>
@@ -236,8 +236,8 @@ export default function App(){
                   })}
                 </div>
                 <div style={{background:"rgba(0,255,136,0.03)",border:"1px solid rgba(0,255,136,0.15)",borderRadius:8,padding:18}}>
-                  <div style={{fontSize:10,letterSpacing:2,color:"#00ff88",marginBottom:14}}>XGBoost MODEL</div>
-                  {[["Dataset","UNSW-NB15"],["Features","42"],["Classes","Normal / Attack"],["Model","XGBoost"],["Blocked IPs",blockedIPs.length],["Active Alerts",toasts.length]].map(([l,v])=>(
+                  <div style={{fontSize:10,letterSpacing:2,color:"#00ff88",marginBottom:14}}>DETECTION MODE</div>
+                  {[["Mode","Rule-based simulation"],["ML inference","Not connected"],["Blocked IPs",blockedIPs.length],["Active Alerts",toasts.length]].map(([l,v])=>(
                     <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,0.04)",fontSize:11}}>
                       <span style={{color:"#2d4558"}}>{l}</span>
                       <span style={{color:"#c8d6e5"}}>{v}</span>
@@ -291,7 +291,7 @@ export default function App(){
           <div>
             <div style={{marginBottom:20}}>
               <div style={{fontSize:13,color:"#5a7a8a",marginBottom:4}}>ATTACK SIMULATION CONSOLE</div>
-              <div style={{fontSize:11,color:"#2d4558"}}>Trigger real attack signatures — XGBoost classifies, blocks, and emails alert in real-time</div>
+              <div style={{fontSize:11,color:"#2d4558"}}>Simulated events use caller-selected rules and illustrative scores; no ML inference or real attack traffic is used.</div>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,marginBottom:20}}>
               {[
@@ -325,12 +325,12 @@ export default function App(){
                     <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
                       <span style={{fontSize:24}}>🛡️</span>
                       <div>
-                        <div style={{fontSize:14,color:"#00ff88",letterSpacing:1}}>ATTACK DETECTED & BLOCKED</div>
-                        <div style={{fontSize:11,color:"#3a5068"}}>XGBoost classified • Windows Firewall blocked • Email alert sent</div>
+                        <div style={{fontSize:14,color:"#00ff88",letterSpacing:1}}>SIMULATED EVENT PROCESSED</div>
+                        <div style={{fontSize:11,color:"#3a5068"}}>Simulation rule matched • OS firewall action attempted • Email requires configuration</div>
                       </div>
                     </div>
                     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}}>
-                      {[["Source IP",simResult.src_ip],["ML Confidence",fmtConf(simResult.confidence||91.5)],["Action","IP BLOCKED"],["Email","✅ Sent"]].map(([l,v])=>(
+                      {[["Source IP",simResult.src_ip],["Demo score",fmtConf(simResult.confidence||0)],["Action",simResult.blocked?"Block action attempted":"Allowed"],["Email","Configured only"]].map(([l,v])=>(
                         <div key={l} style={{background:"rgba(0,0,0,0.3)",borderRadius:6,padding:"12px 14px"}}>
                           <div style={{fontSize:10,color:"#2d4558",marginBottom:4}}>{l}</div>
                           <div style={{fontSize:12,color:"#e0eaf2"}}>{v}</div>
@@ -347,8 +347,8 @@ export default function App(){
         {tab==="blocked"&&(
           <div style={{background:"rgba(255,255,255,0.025)",border:"1px solid rgba(255,59,59,0.15)",borderRadius:8,overflow:"hidden"}}>
             <div style={{padding:"13px 20px",borderBottom:"1px solid rgba(255,255,255,0.05)",display:"flex",justifyContent:"space-between"}}>
-              <span style={{fontSize:11,letterSpacing:2,color:"#3a5068"}}>BLOCKED ADDRESSES ({blockedIPs.length})</span>
-              <span style={{fontSize:10,color:"#ff3b3b"}}>AUTO-BLOCKED BY XGBoost ML</span>
+              <span style={{fontSize:11,letterSpacing:2,color:"#3a5068"}}>ADDRESSES WITH DEMO BLOCK ACTIONS ({blockedIPs.length})</span>
+              <span style={{fontSize:10,color:"#ff3b3b"}}>DEMO BLOCK ACTIONS</span>
             </div>
             <div style={{padding:20,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
               {blockedIPs.map(({ip,reason,blocked_at,count})=>(
@@ -369,8 +369,8 @@ export default function App(){
         {tab==="model"&&(
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
             <div style={{background:"rgba(0,255,136,0.03)",border:"1px solid rgba(0,255,136,0.15)",borderRadius:8,padding:24}}>
-              <div style={{fontSize:11,letterSpacing:2,color:"#00ff88",marginBottom:20}}>XGBoost MODEL DETAILS</div>
-              {[["Algorithm","XGBoost Classifier"],["Dataset","UNSW-NB15"],["Total Features","42"],["Output Classes","0=Normal, 1=Attack"],["Model File","aegisfinal_xgboost.pkl"],["Status",modelInfo?.loaded?"✅ Loaded":"❌ Not loaded"]].map(([l,v])=>(
+              <div style={{fontSize:11,letterSpacing:2,color:"#00ff88",marginBottom:20}}>MODEL STATUS</div>
+              {[["Live detection","Rule-based simulation"],["ML inference","Not connected"],["Artifact loaded",modelInfo?.loaded?"Yes":"No"],["Evaluation metrics","Not verified"]].map(([l,v])=>(
                 <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.04)",fontSize:12}}>
                   <span style={{color:"#3a5068"}}>{l}</span>
                   <span style={{color:"#c8d6e5"}}>{v}</span>
@@ -378,11 +378,9 @@ export default function App(){
               ))}
             </div>
             <div style={{background:"rgba(255,255,255,0.025)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:8,padding:24}}>
-              <div style={{fontSize:11,letterSpacing:2,color:"#3a5068",marginBottom:20}}>42 FEATURES (UNSW-NB15)</div>
+              <div style={{fontSize:11,letterSpacing:2,color:"#3a5068",marginBottom:20}}>MODEL EVALUATION</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-                {(modelInfo?.feature_names||FEATURES).map(f=>(
-                  <span key={f} style={{padding:"3px 8px",background:"rgba(0,229,255,0.07)",border:"1px solid rgba(0,229,255,0.15)",borderRadius:3,fontSize:10,color:"#00e5ff"}}>{f}</span>
-                ))}
+                <div style={{fontSize:12,color:"#c8d6e5"}}>No verified evaluation metrics are published. The loaded artifact is not connected to the live detection flow.</div>
               </div>
             </div>
           </div>

@@ -16,10 +16,12 @@ import os
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 EMAIL_CONFIG = {
-    "sender": "rohanshinde0702@gmail.com",
-    "password": "ksri bonl xjtc rlwg",
-    "receiver": "rohanshinde072003@gmail.com",
-    "enabled": True,
+    "sender": os.getenv("AEGIS_EMAIL_SENDER", ""),
+    "password": os.getenv("AEGIS_EMAIL_PASSWORD", ""),
+    "receiver": os.getenv("AEGIS_EMAIL_RECEIVER", ""),
+    "enabled": all(os.getenv(name) for name in (
+        "AEGIS_EMAIL_SENDER", "AEGIS_EMAIL_PASSWORD", "AEGIS_EMAIL_RECEIVER"
+    )),
 }
 
 # ─── Model Auto-detect ────────────────────────────────────────────────────────
@@ -50,7 +52,7 @@ try:
     if MODEL_PATH:
         with open(MODEL_PATH, "rb") as f:
             model = pickle.load(f)
-        print(f"✅ XGBoost loaded | Features: {len(model.feature_names_in_)} | Accuracy: 92%")
+        print(f"✅ XGBoost loaded | Features: {len(model.feature_names_in_)} | Not used in live detections")
     else:
         model = None
         print("⚠️  Model not found — using rule-based detection")
@@ -142,7 +144,7 @@ def send_email_alert(src_ip, attack_type, confidence, details):
         return
     try:
         msg = MIMEMultipart("alternative")
-        msg["Subject"] = f"🚨 AEGIS AI ALERT — {attack_type} Detected & Blocked"
+        msg["Subject"] = f"AEGIS AI DEMO ALERT — simulated {attack_type} event"
         msg["From"] = EMAIL_CONFIG["sender"]
         msg["To"] = EMAIL_CONFIG["receiver"]
         html = f"""
@@ -150,7 +152,7 @@ def send_email_alert(src_ip, attack_type, confidence, details):
         <div style="max-width:600px;margin:0 auto;border:1px solid #00ff8844;border-radius:8px;overflow:hidden">
           <div style="background:#0a1628;padding:20px;border-bottom:1px solid #00ff8833">
             <h2 style="color:#00ff88;margin:0">⚔ AEGIS AI — THREAT DETECTED</h2>
-            <p style="color:#3a5068;margin:4px 0 0">XGBoost ML Model (Accuracy: 92%) • UNSW-NB15 Dataset</p>
+            <p style="color:#3a5068;margin:4px 0 0">Aegis demo alert • simulated detection score</p>
           </div>
           <div style="padding:24px">
             <table style="width:100%;border-collapse:collapse">
@@ -160,10 +162,10 @@ def send_email_alert(src_ip, attack_type, confidence, details):
                   <td style="padding:8px;color:#ff3b3b"><b>{src_ip}</b></td></tr>
               <tr><td style="padding:8px;color:#3a5068;border-bottom:1px solid #ffffff11">Attack Type</td>
                   <td style="padding:8px;color:#ffcc00"><b>{attack_type}</b></td></tr>
-              <tr><td style="padding:8px;color:#3a5068;border-bottom:1px solid #ffffff11">ML Confidence</td>
+              <tr><td style="padding:8px;color:#3a5068;border-bottom:1px solid #ffffff11">Demo score</td>
                   <td style="padding:8px;color:#ff6b35"><b>{confidence:.1f}%</b></td></tr>
               <tr><td style="padding:8px;color:#3a5068;border-bottom:1px solid #ffffff11">Action</td>
-                  <td style="padding:8px;color:#00ff88"><b>✅ IP BLOCKED (Windows Firewall)</b></td></tr>
+                  <td style="padding:8px;color:#00ff88"><b>Windows Firewall block action attempted</b></td></tr>
               <tr><td style="padding:8px;color:#3a5068">Details</td>
                   <td style="padding:8px;color:#5a7a8a">{details}</td></tr>
             </table>
@@ -197,19 +199,17 @@ def email_worker():
 
 threading.Thread(target=email_worker, daemon=True).start()
 
-# ─── REALISTIC CONFIDENCE LOGIC ──────────────────────────────────────────────
-# Model accuracy = 92%
-# Normal traffic  → 15% to 45% confidence (ALLOWED) — realistic
-# Attack traffic  → 85% to 95% confidence (BLOCKED)  — model detects correctly
+# ─── SIMULATION SCORES ───────────────────────────────────────────────────────
+# These randomized values are illustrative only; they are not model probabilities.
 
-def realistic_normal_confidence():
-    """Normal traffic ka realistic confidence — 15% to 45%"""
+def simulation_normal_score():
+    """Return an illustrative score for normal traffic in the simulator."""
     return round(random.uniform(15.0, 45.0), 1)
 
-def realistic_attack_confidence(attack_type):
+def simulation_attack_score(attack_type):
     """
-    Attack ka realistic confidence based on model accuracy 92%
-    Kuch attacks model zyada confidently detect karta hai
+    Illustrative score for a named simulated attack
+    Scores are randomized and do not represent model confidence.
     """
     ranges = {
         "DDoS":         (88.0, 95.0),   # DDoS sabse easy detect hota hai
@@ -226,7 +226,7 @@ def realistic_attack_confidence(attack_type):
 def process_normal_traffic(src_ip, dst_ip, sport, dport, proto, sbytes, dbytes):
     
     
-    confidence = realistic_normal_confidence()
+    confidence = simulation_normal_score()
 
     result = {
         "timestamp": datetime.now().isoformat(),
@@ -272,7 +272,7 @@ def process_connection(src_ip, dst_ip, sport, dport, proto,
         )
 
     # ── ATTACK DETECTED ──
-    confidence = realistic_attack_confidence(attack_type)
+    confidence = simulation_attack_score(attack_type)
 
     result = {
         "timestamp": datetime.now().isoformat(),

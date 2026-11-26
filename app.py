@@ -108,8 +108,8 @@ def api_stats():
         "flagged": s.get("flagged", 0),
         "allowed": s["total"] - s["blocked"],
         "attack_types": dict(s.get("attack_types", {})),
-        "ml_model": "XGBoost (UNSW-NB15)",
-        "features": 42,
+        "detection_mode": "Rule-based simulation",
+        "ml_inference_enabled": False,
     }
 
 @app.get("/api/detections")
@@ -175,12 +175,13 @@ def api_model():
     from packet_engine import model
     return {
         "loaded": model is not None,
-        "algorithm": "XGBoost Classifier",
-        "dataset": "UNSW-NB15",
-        "features": 42,
-        "accuracy": "92%",
-        "classes": ["Normal (0)", "Attack (1)"],
-        "feature_names": list(model.feature_names_in_) if model else [],
+        "algorithm": "Not used for live detections",
+        "dataset": None,
+        "features": 0,
+        "accuracy": None,
+        "classes": [],
+        "feature_names": [],
+        "inference_enabled": False,
     }
 
 @app.get("/")
